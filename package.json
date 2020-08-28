@@ -1,0 +1,12 @@
+{
+  "name": "eleventy-load",
+  "version": "0.0.1",
+  "description": "Use loaders to preprocess files in your Eleventy project",
+  "main": ".eleventy.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "https://github.com/gregives/eleventy-load",
+  "author": "Greg Ives",
+  "license": "MIT"
+}
