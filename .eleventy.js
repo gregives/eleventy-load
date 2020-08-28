@@ -1,4 +1,4 @@
-const fs = require('fs')
+const fs = require('fs').promises
 
 class EleventyLoad {
   constructor(config, options) {
@@ -25,7 +25,7 @@ class EleventyLoad {
   }
 
   // Start processing files from entry point
-  start(content, entry) {
+  async start(content, entry) {
     const loaders = this.getLoaders(entry)
 
     // Return content if no loaders match
@@ -33,10 +33,10 @@ class EleventyLoad {
       return content
 
     // Process entry file with loaders
-    content = this.processFile(content, loaders)
+    content = await this.processFile(content, loaders)
 
     // Process files added to queue
-    this.processFileQueue()
+    await this.processFileQueue()
 
     return content
   }
@@ -51,18 +51,18 @@ class EleventyLoad {
   }
 
   // Process file with the given loaders
-  processFile(content, loaders) {
+  async processFile(content, loaders) {
     // Apply loaders to content in order
     for (const loader of loaders) {
       const loaderFunction = loader.loader.bind(this.loaderContext)
-      content = loaderFunction(content, loader.options)
+      content = await loaderFunction(content, loader.options)
     }
 
     return content
   }
 
   // Process all fies in queue
-  processFileQueue() {
+  async processFileQueue() {
     // Process remaining files in queue
     while (this.files.length > 0) {
       // Get loaders for file given path
@@ -75,10 +75,10 @@ class EleventyLoad {
 
       // If loader has raw property, load content as buffer instead of string
       const encoding = loaders[0].loader.raw ? null : 'utf8'
-      const content = fs.readFileSync(path, { encoding })
+      const content = await fs.readFile(path, { encoding })
 
       // Process file with loaders
-      this.processFile(content, loaders)
+      await this.processFile(content, loaders)
     }
   }
 }
