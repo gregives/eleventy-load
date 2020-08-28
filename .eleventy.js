@@ -2,11 +2,12 @@ const fs = require('fs')
 
 class EleventyLoad {
   constructor(config, options) {
+    this.config = config
     this.options = options
     this.files = []
 
     // Transform is our entry point
-    config.addTransform('eleventy-load', this.start.bind(this))
+    this.config.addTransform('eleventy-load', this.start.bind(this))
   }
 
   // Context of loaders
@@ -20,6 +21,7 @@ class EleventyLoad {
   // Add dependency to file queue
   addDependency(path) {
     this.files.push(path)
+    this.config.addWatchTarget(path)
   }
 
   // Start processing files from entry point
