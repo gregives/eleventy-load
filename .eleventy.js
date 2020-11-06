@@ -1,12 +1,28 @@
 const fs = require("fs").promises;
+const utils = require("./utils");
 
 class EleventyLoad {
   constructor(config, options) {
-    this.config = config;
     this.options = options;
 
+    // Create context for loaders
+    this.context = {
+      addDependency: this.addDependency.bind(this),
+      // Bind utils to EleventyLoad
+      ...Object.keys(utils).reduce((acc, util) => {
+        acc[util] = utils[util].bind(this);
+        return acc;
+      }, {}),
+    };
+
+    // Keep reference to this
+    const self = this;
+
     // Transform is our entry point
-    this.config.addTransform("eleventy-load", this.processFile.bind(this));
+    config.addTransform("eleventy-load", function (...args) {
+      self.context.config = this._config;
+      return self.processFile(...args);
+    });
   }
 
   // Process additional dependencies straight away
@@ -40,12 +56,12 @@ class EleventyLoad {
       content = await this.getContent(path, loaders);
     }
 
+    // Add resource to context
+    this.context.resource = path;
+
     // Apply loaders to content in order
     for (const loader of loaders) {
-      const loaderFunction = loader.loader.bind({
-        addDependency: this.addDependency.bind(this),
-      });
-
+      const loaderFunction = loader.loader.bind(this.context);
       content = await loaderFunction(content, loader.options);
     }
 
