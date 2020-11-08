@@ -27,7 +27,15 @@ class EleventyLoad {
 
   // Process additional dependencies straight away
   async addDependency(path) {
-    return await this.processFile(null, path);
+    // Keep track of dependent resource
+    const resource = this.context.resource;
+    this.context.resource = path;
+
+    // Return the result of processed file
+    const result = await this.processFile(null, path);
+
+    this.context.resource = resource;
+    return result;
   }
 
   // Get loaders for path
@@ -55,9 +63,6 @@ class EleventyLoad {
     if (content === null) {
       content = await this.getContent(path, loaders);
     }
-
-    // Add resource to context
-    this.context.resource = path;
 
     // Apply loaders to content in order
     for (const loader of loaders) {
