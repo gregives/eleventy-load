@@ -1,4 +1,5 @@
 const fs = require("fs").promises;
+const { resolve, parse } = require("path");
 const utils = require("./utils");
 
 class EleventyLoad {
@@ -15,6 +16,9 @@ class EleventyLoad {
       }, {}),
     };
 
+    // Create cache
+    this.cache = {};
+
     // Keep reference to this
     const self = this;
 
@@ -27,12 +31,25 @@ class EleventyLoad {
 
   // Process additional dependencies straight away
   async addDependency(path) {
+    // Resolve path for consistency
+    path = resolve(
+      this.context.resource
+        ? parse(this.context.resource).dir
+        : this.context.config.inputDir,
+      path
+    );
+
     // Keep track of dependent resource
     const resource = this.context.resource;
     this.context.resource = path;
 
     // Return the result of processed file
-    const result = await this.processFile(null, path);
+    const result = this.cache.hasOwnProperty(path)
+      ? this.cache[path]
+      : await this.processFile(null, path);
+
+    // Cache result of processed file
+    this.cache[path] = result;
 
     this.context.resource = resource;
     return result;
