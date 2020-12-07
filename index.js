@@ -1,5 +1,5 @@
 const fs = require("fs").promises;
-const { resolve, parse } = require("path");
+const path = require("path");
 const utils = require("./utils");
 
 class EleventyLoad {
@@ -25,72 +25,95 @@ class EleventyLoad {
     // Transform is our entry point
     config.addTransform("eleventy-load", function (content) {
       self.context.config = this._config;
-      return self.addDependency(resolve(this.inputPath), content);
+      const resource = path.relative(this._config.inputDir, this.inputPath);
+      return self.addDependency(resource, content);
     });
   }
 
   // Process additional dependencies straight away
-  async addDependency(path, content = null) {
-    // Resolve path for consistency
-    path = resolve(
-      this.context.resource
-        ? parse(this.context.resource).dir
-        : this.context.config.inputDir,
-      path
-    );
+  async addDependency(resource, content = null) {
+    const [resourcePath, resourceQuery] = resource.split(/(?=\?)/g);
 
-    // Allow for query parameters
-    const [pathname, query] = path.split(/(?=\?)/g);
+    // Dependent resource
+    const dependentResource = {
+      resource: this.context.resource,
+      resourcePath: this.context.resourcePath,
+      resourceQuery: this.context.resourceQuery,
+    };
 
-    // Keep track of dependent resource
-    const { resource, resourcePath, resourceQuery } = this.context;
-    this.context.resource = path;
-    this.context.resourcePath = pathname;
-    this.context.resourceQuery = query;
+    const resolvedDirectory = dependentResource.resource
+      ? path.resolve(
+          this.context.config.inputDir,
+          path.parse(dependentResource.resourcePath).dir
+        )
+      : this.context.config.inputDir;
 
-    // Return the result of processed file
-    const result = this.cache.hasOwnProperty(path)
-      ? this.cache[path]
-      : await this.processFile(path, pathname, content);
+    // Resolve resource for consistency
+    const resolvedResource = path.resolve(resolvedDirectory, resource);
+    const resolvedResourcePath = path.resolve(resolvedDirectory, resourcePath);
 
-    // Cache result of processed file
-    this.cache[path] = result;
+    // Define the current resource
+    const currentResource = {
+      resource,
+      resourcePath,
+      resourceQuery,
+    };
 
-    // Return to dependent resource
+    // Update context with current resource
     this.context = {
       ...this.context,
-      ...{ resource, resourcePath, resourceQuery },
+      ...currentResource,
+    };
+
+    // Return the result of processed file
+    const result = this.cache.hasOwnProperty(resolvedResource)
+      ? this.cache[resolvedResource]
+      : await this.processFile(resource, resolvedResourcePath, content);
+
+    // Cache result of processed file
+    this.cache[resolvedResource] = result;
+
+    // Reset to dependent resource
+    this.context = {
+      ...this.context,
+      ...dependentResource,
     };
     return result;
   }
 
-  // Get loaders for path
-  getLoaders(pathname) {
-    // Find which rule matches the given path
-    const rule = this.options.rules.find((rule) => rule.test.test(pathname));
+  // Get loaders for resource
+  getLoaders(resourcePath) {
+    // Find which rule matches the given resource path
+    const rule = this.options.rules.find((rule) =>
+      rule.test.test(resourcePath)
+    );
 
     // Return loaders if they exist, else null
     return rule && rule.loaders ? rule.loaders : null;
   }
 
   // Load content of file
-  async getContent(pathname, loaders) {
+  async getContent(resourcePath, loaders) {
     // If loader has raw property, load content as buffer instead of string
     const encoding = loaders[0].loader.raw ? null : "utf8";
-    return await fs.readFile(pathname, { encoding });
+    return await fs.readFile(resourcePath, { encoding });
   }
 
   // Process file with the given loaders
-  async processFile(path, pathname, content) {
+  async processFile(resource, resourcePath, content) {
     // Get loaders for file
-    const loaders = this.getLoaders(pathname);
+    const loaders = this.getLoaders(resourcePath);
 
     // Return content or path if no loaders match
-    if (loaders === null) return content || path;
+    if (loaders === null) return content || resource;
 
     // If content isn't passed in, load from path
     if (content === null) {
-      content = await this.getContent(pathname, loaders);
+      try {
+        content = await this.getContent(resourcePath, loaders);
+      } catch {
+        return resource;
+      }
     }
 
     // Apply loaders to content in order
