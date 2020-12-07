@@ -23,14 +23,14 @@ class EleventyLoad {
     const self = this;
 
     // Transform is our entry point
-    config.addTransform("eleventy-load", function (...args) {
+    config.addTransform("eleventy-load", function (content) {
       self.context.config = this._config;
-      return self.processFile(...args);
+      return self.addDependency(resolve(this.inputPath), content);
     });
   }
 
   // Process additional dependencies straight away
-  async addDependency(path) {
+  async addDependency(path, content = null) {
     // Resolve path for consistency
     path = resolve(
       this.context.resource
@@ -39,46 +39,58 @@ class EleventyLoad {
       path
     );
 
+    // Allow for query parameters
+    const [pathname, query] = path.split(/(?=\?)/g);
+
     // Keep track of dependent resource
-    const resource = this.context.resource;
+    const { resource, resourcePath, resourceQuery } = this.context;
     this.context.resource = path;
+    this.context.resourcePath = pathname;
+    this.context.resourceQuery = query;
 
     // Return the result of processed file
     const result = this.cache.hasOwnProperty(path)
       ? this.cache[path]
-      : await this.processFile(null, path);
+      : await this.processFile(path, pathname, content);
 
     // Cache result of processed file
     this.cache[path] = result;
 
-    this.context.resource = resource;
+    // Return to dependent resource
+    this.context = {
+      ...this.context,
+      ...{ resource, resourcePath, resourceQuery },
+    };
     return result;
   }
 
   // Get loaders for path
-  getLoaders(path) {
+  getLoaders(pathname) {
     // Find which rule matches the given path
-    const rule = this.options.rules.find((rule) => rule.test.test(path));
+    const rule = this.options.rules.find((rule) => rule.test.test(pathname));
 
     // Return loaders if they exist, else null
     return rule && rule.loaders ? rule.loaders : null;
   }
 
   // Load content of file
-  async getContent(path, loaders) {
+  async getContent(pathname, loaders) {
     // If loader has raw property, load content as buffer instead of string
     const encoding = loaders[0].loader.raw ? null : "utf8";
-    return await fs.readFile(path, { encoding });
+    return await fs.readFile(pathname, { encoding });
   }
 
   // Process file with the given loaders
-  async processFile(content, path, loaders = this.getLoaders(path)) {
+  async processFile(path, pathname, content) {
+    // Get loaders for file
+    const loaders = this.getLoaders(pathname);
+
     // Return content or path if no loaders match
     if (loaders === null) return content || path;
 
     // If content isn't passed in, load from path
     if (content === null) {
-      content = await this.getContent(path, loaders);
+      content = await this.getContent(pathname, loaders);
     }
 
     // Apply loaders to content in order
