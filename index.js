@@ -25,8 +25,15 @@ class EleventyLoad {
     // Transform is our entry point
     config.addTransform("eleventy-load", function (content) {
       self.context.config = this._config;
+
+      // Use input path as dependency
       const resource = path.relative(this._config.inputDir, this.inputPath);
       return self.addDependency(resource, content);
+    });
+
+    // Clear cache on re-runs
+    config.on('beforeWatch', () => {
+      this.cache = {}
     });
   }
 
