@@ -15,7 +15,7 @@ class EleventyLoad {
         acc[util] = utils[util].bind(this);
         return acc;
       }, {}),
-      config: context._config
+      config: context._config,
     };
 
     // Use input path as dependency
@@ -36,9 +36,9 @@ class EleventyLoad {
 
     const resolvedDirectory = dependentResource.resource
       ? path.resolve(
-        this.context.config.inputDir,
-        path.parse(dependentResource.resourcePath).dir
-      )
+          this.context.config.inputDir,
+          path.parse(dependentResource.resourcePath).dir
+        )
       : this.context.config.inputDir;
 
     // Resolve resource for consistency
@@ -120,15 +120,27 @@ class EleventyLoad {
 }
 
 module.exports = function (config, options) {
-  const cache = {}
+  if (!(options.rules instanceof Array)) {
+    console.warn(
+      [
+        "======================================",
+        " Try giving eleventy-load some rules! ",
+        "======================================",
+        "",
+      ].join("\n")
+    );
+    return;
+  }
+
+  const cache = {};
 
   // Transform is our entry point
   config.addTransform("eleventy-load", function (content) {
-    return new EleventyLoad(options, cache, content, this)
+    return new EleventyLoad(options, cache, content, this);
   });
 
   // Clear cache on re-runs
-  config.on('beforeWatch', () => {
+  config.on("beforeWatch", () => {
     for (const resource in cache) {
       delete cache[resource];
     }
