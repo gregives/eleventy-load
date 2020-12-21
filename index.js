@@ -3,8 +3,9 @@ const path = require("path");
 const utils = require("./utils");
 
 class EleventyLoad {
-  constructor(config, options) {
+  constructor(options, cache, content, context) {
     this.options = options;
+    this.cache = cache;
 
     // Create context for loaders
     this.context = {
@@ -14,27 +15,12 @@ class EleventyLoad {
         acc[util] = utils[util].bind(this);
         return acc;
       }, {}),
+      config: context._config
     };
 
-    // Create cache
-    this.cache = {};
-
-    // Keep reference to this
-    const self = this;
-
-    // Transform is our entry point
-    config.addTransform("eleventy-load", function (content) {
-      self.context.config = this._config;
-
-      // Use input path as dependency
-      const resource = path.relative(this._config.inputDir, this.inputPath);
-      return self.addDependency(resource, content);
-    });
-
-    // Clear cache on re-runs
-    config.on('beforeWatch', () => {
-      this.cache = {}
-    });
+    // Use input path as dependency
+    const resource = path.relative(context._config.inputDir, context.inputPath);
+    return this.addDependency(resource, content);
   }
 
   // Process additional dependencies straight away
@@ -50,9 +36,9 @@ class EleventyLoad {
 
     const resolvedDirectory = dependentResource.resource
       ? path.resolve(
-          this.context.config.inputDir,
-          path.parse(dependentResource.resourcePath).dir
-        )
+        this.context.config.inputDir,
+        path.parse(dependentResource.resourcePath).dir
+      )
       : this.context.config.inputDir;
 
     // Resolve resource for consistency
@@ -134,5 +120,17 @@ class EleventyLoad {
 }
 
 module.exports = function (config, options) {
-  return new EleventyLoad(config, options);
+  const cache = {}
+
+  // Transform is our entry point
+  config.addTransform("eleventy-load", function (content) {
+    return new EleventyLoad(options, cache, content, this)
+  });
+
+  // Clear cache on re-runs
+  config.on('beforeWatch', () => {
+    for (const resource in cache) {
+      delete cache[resource];
+    }
+  });
 };
