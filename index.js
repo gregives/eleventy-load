@@ -34,16 +34,9 @@ class EleventyLoad {
       resourceQuery: this.context.resourceQuery,
     };
 
-    const resolvedDirectory = dependentResource.resource
-      ? path.resolve(
-          this.context.config.inputDir,
-          path.parse(dependentResource.resourcePath).dir
-        )
-      : this.context.config.inputDir;
-
     // Resolve resource for consistency
-    const resolvedResource = path.resolve(resolvedDirectory, resource);
-    const resolvedResourcePath = path.resolve(resolvedDirectory, resourcePath);
+    const resolvedResource = path.resolve(this.context.config.inputDir, resource);
+    const resolvedResourcePath = path.resolve(this.context.config.inputDir, resourcePath);
 
     // Define the current resource
     const currentResource = {
