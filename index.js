@@ -23,6 +23,12 @@ class EleventyLoad {
     return this.addDependency(resource, content);
   }
 
+  debug(string, override) {
+    if (this.options.debug || override) {
+      console.log(`[eleventy-load] ${string}`);
+    }
+  }
+
   // Process additional dependencies straight away
   async addDependency(resource, content = null) {
     const [resourcePath, resourceQuery] = resource.split(/(?=\?)/g);
@@ -51,13 +57,14 @@ class EleventyLoad {
       ...currentResource,
     };
 
-    // Return the result of processed file
-    const result = this.cache.hasOwnProperty(resolvedResource)
-      ? this.cache[resolvedResource]
-      : await this.processFile(resource, resolvedResourcePath, content);
+    // Start processing file and add to cache
+    if (!this.cache.hasOwnProperty(resolvedResource)) {
+      this.debug(`Processing resource: ${resource}`);
+      this.cache[resolvedResource] = this.processFile(resource, resolvedResourcePath, content);
+    }
 
-    // Cache result of processed file
-    this.cache[resolvedResource] = result;
+    // Wait for resource to be processed
+    const result = await this.cache[resolvedResource];
 
     // Reset to dependent resource
     this.context = {
@@ -114,14 +121,7 @@ class EleventyLoad {
 
 module.exports = function (config, options) {
   if (!(options.rules instanceof Array)) {
-    console.warn(
-      [
-        "======================================",
-        " Try giving eleventy-load some rules! ",
-        "======================================",
-        "",
-      ].join("\n")
-    );
+    console.warn("[eleventy-load] Try giving me some rules!");
     return;
   }
 
