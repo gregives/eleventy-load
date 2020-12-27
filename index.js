@@ -1,4 +1,4 @@
-const fs = require("fs").promises;
+const fs = require("fs");
 const path = require("path");
 const utils = require("./utils");
 
@@ -86,10 +86,10 @@ class EleventyLoad {
   }
 
   // Load content of file
-  async getContent(resourcePath, loaders) {
+  getContent(resourcePath, loaders) {
     // If loader has raw property, load content as buffer instead of string
     const encoding = loaders[0].loader.raw ? null : "utf8";
-    return await fs.readFile(resourcePath, { encoding });
+    return fs.readFileSync(resourcePath, { encoding });
   }
 
   // Process file with the given loaders
