@@ -8,5 +8,11 @@
   },
   "repository": "https://github.com/gregives/eleventy-load",
   "author": "Greg Ives",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^7.16.0",
+    "eslint-config-prettier": "^7.1.0",
+    "eslint-plugin-prettier": "^3.3.0",
+    "prettier": "^2.2.1"
+  }
 }

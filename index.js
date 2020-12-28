@@ -41,8 +41,14 @@ class EleventyLoad {
     };
 
     // Resolve resource for consistency
-    const resolvedResource = path.resolve(this.context.config.inputDir, resource);
-    const resolvedResourcePath = path.resolve(this.context.config.inputDir, resourcePath);
+    const resolvedResource = path.resolve(
+      this.context.config.inputDir,
+      resource
+    );
+    const resolvedResourcePath = path.resolve(
+      this.context.config.inputDir,
+      resourcePath
+    );
 
     // Define the current resource
     const currentResource = {
@@ -60,7 +66,11 @@ class EleventyLoad {
     // Start processing file and add to cache
     if (!this.cache.hasOwnProperty(resolvedResource)) {
       this.debug(`Processing resource: ${resource}`);
-      this.cache[resolvedResource] = this.processFile(resource, resolvedResourcePath, content);
+      this.cache[resolvedResource] = this.processFile(
+        resource,
+        resolvedResourcePath,
+        content
+      );
     }
 
     // Wait for resource to be processed
