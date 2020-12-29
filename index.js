@@ -3,29 +3,28 @@ const path = require("path");
 const utils = require("./utils");
 
 class EleventyLoad {
-  constructor(options, cache, content, context) {
+  constructor(options, cache, resource, content, config) {
     this.options = options;
     this.cache = cache;
 
     // Create context for loaders
     this.context = {
       addDependency: this.addDependency.bind(this),
+      config,
       // Bind utils to EleventyLoad
       ...Object.keys(utils).reduce((acc, util) => {
         acc[util] = utils[util].bind(this);
         return acc;
       }, {}),
-      config: context._config,
     };
 
-    // Use input path as dependency
-    const resource = path.relative(context._config.inputDir, context.inputPath);
+    // Start processing initial dependency
     return this.addDependency(resource, content);
   }
 
   debug(string, override) {
     if (this.options.debug || override) {
-      console.log(`[eleventy-load] ${string}`);
+      console.info(`[eleventy-load] ${string}`);
     }
   }
 
@@ -129,7 +128,32 @@ class EleventyLoad {
   }
 }
 
+// Create config frpm transform or shortcode context
+function createConfig(type, config, context) {
+  return {
+    transform() {
+      return {
+        inputDir: path.normalize(context._config.dir.input),
+        outputDir: path.normalize(context._config.dir.output),
+        ...config,
+      };
+    },
+    shortcode() {
+      const { inputPath, outputPath, filePathStem, url } = context.page;
+      // Determine input and output directories from page context
+      const [inputDir] = inputPath.split(filePathStem);
+      const [outputDir] = outputPath.split(url);
+      return {
+        inputDir: path.normalize(inputDir),
+        outputDir: path.normalize(outputDir),
+        ...config,
+      };
+    },
+  }[type]();
+}
+
 module.exports = function (config, options) {
+  // Return and warn if no rules are given
   if (!(options.rules instanceof Array)) {
     console.warn("[eleventy-load] Try giving me some rules!");
     return;
@@ -137,9 +161,27 @@ module.exports = function (config, options) {
 
   const cache = {};
 
-  // Transform is our entry point
+  // Create new EleventyLoad instance in transform
   config.addTransform("eleventy-load", function (content) {
-    return new EleventyLoad(options, cache, content, this);
+    const resource = path.relative(this._config.inputDir, this.inputPath);
+    return new EleventyLoad(
+      options,
+      cache,
+      resource,
+      content,
+      createConfig("transform", config, this)
+    );
+  });
+
+  // Create new EleventyLoad instance in shortcode
+  config.addShortcode("load", function (resource) {
+    return new EleventyLoad(
+      options,
+      cache,
+      resource,
+      null,
+      createConfig("shortcode", config, this)
+    );
   });
 
   // Clear cache on re-runs
