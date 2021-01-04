@@ -2,6 +2,8 @@ const fs = require("fs");
 const path = require("path");
 const utils = require("./utils");
 
+const DEBUG_STRING = "[eleventy-load]";
+
 class EleventyLoad {
   constructor(options, cache, resource, content, config) {
     this.options = options;
@@ -24,7 +26,7 @@ class EleventyLoad {
 
   debug(string, override) {
     if (this.options.debug || override) {
-      console.info(`[eleventy-load] ${string}`);
+      console.info(`${DEBUG_STRING} ${string}`);
     }
   }
 
@@ -155,7 +157,7 @@ function createConfig(type, config, context) {
 module.exports = function (config, options) {
   // Return and warn if no rules are given
   if (!(options.rules instanceof Array)) {
-    console.warn("[eleventy-load] Try giving me some rules!");
+    console.warn(`${DEBUG_STRING} Try giving me some rules!`);
     return;
   }
 
