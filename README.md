@@ -16,7 +16,7 @@ Visit the [eleventy-load website][eleventy-load-index] for usage instructions, e
 
 For more detailed instructions, see the [eleventy-load website][eleventy-load-usage].
 
-The following example sets up eleventy-load so that you can import Sass files just like you would import CSS files, with a `link` element.
+The following example sets up eleventy-load so that you can import Sass files just like you would import CSS files.
 
 1. Install eleventy-load and any loaders you need.
 
