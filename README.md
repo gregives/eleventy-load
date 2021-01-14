@@ -3,6 +3,7 @@
 [![npm version][npm-version-src]][npm-version-href]
 [![npm downloads][npm-downloads-src]][npm-downloads-href]
 [![License][license-src]][license-href]
+[![Prettier][prettier-src]][prettier-href]
 
 Wish there was a way to import Sass files as easily as CSS files? Now there is!
 
@@ -99,3 +100,5 @@ I'd love some help adding tests to eleventy-load and growing the ecosystem of lo
 [npm-downloads-href]: https://npmjs.com/package/eleventy-load
 [license-src]: https://img.shields.io/npm/l/eleventy-load.svg
 [license-href]: https://npmjs.com/package/eleventy-load
+[prettier-src]: https://img.shields.io/badge/code_style-prettier-ff69b4.svg
+[prettier-href]: https://github.com/prettier/prettier
