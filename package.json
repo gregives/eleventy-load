@@ -4,9 +4,10 @@
   "description": "Use loaders to post-process files in your Eleventy project",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "release": "np"
   },
-  "repository": "https://github.com/gregives/eleventy-load",
+  "repository": "gregives/eleventy-load",
+  "homepage": "https://eleventy-load.netlify.app",
   "author": "Greg Ives",
   "license": "MIT",
   "devDependencies": {
@@ -15,6 +16,7 @@
     "eslint-plugin-prettier": "^3.3.0",
     "husky": "^4.3.6",
     "lint-staged": "^10.5.3",
+    "np": "*",
     "prettier": "^2.2.1"
   },
   "husky": {
