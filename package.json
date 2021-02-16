@@ -9,6 +9,14 @@
   "repository": "gregives/eleventy-load",
   "homepage": "https://eleventy-load.netlify.app",
   "author": "Greg Ives",
+  "keywords": [
+    "eleventy",
+    "eleventy-plugin",
+    "eleventy-load",
+    "assets",
+    "dependencies",
+    "loaders"
+  ],
   "license": "MIT",
   "devDependencies": {
     "eslint": "^7.16.0",
