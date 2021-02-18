@@ -91,9 +91,9 @@ I'd love some help adding tests to eleventy-load and growing the ecosystem of lo
 
 <!-- References -->
 
-[eleventy-load-index]: https://eleventy-load.netlify.app/
-[eleventy-load-usage]: https://eleventy-load.netlify.app/usage/
-[eleventy-load-loaders]: https://eleventy-load.netlify.app/loaders/
+[eleventy-load-index]: https://eleventy-load.xyz/
+[eleventy-load-usage]: https://eleventy-load.xyz/usage/
+[eleventy-load-loaders]: https://eleventy-load.xyz/loaders/
 [npm-version-src]: https://img.shields.io/npm/v/eleventy-load/latest.svg
 [npm-version-href]: https://npmjs.com/package/eleventy-load
 [npm-downloads-src]: https://img.shields.io/npm/dt/eleventy-load.svg
