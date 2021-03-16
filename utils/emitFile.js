@@ -6,10 +6,14 @@ const hashContent = (content, length) =>
   crypto.createHash("md5").update(content).digest("hex").slice(0, length);
 
 module.exports = function (content, filepath, emitFile = true) {
-  const { ext, name } = path.parse(this.context.resourcePath);
+  const { dir, ext, name } = path.parse(this.context.resourcePath);
 
   // Placeholder values to replace
   const replacements = [
+    {
+      test: /\[dir]/g,
+      replace: dir,
+    },
     {
       test: /\[name]/g,
       replace: name,
