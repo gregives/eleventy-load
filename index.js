@@ -70,6 +70,7 @@ class EleventyLoad {
       this.cache[resolvedResource] = this.processFile(
         resource,
         resolvedResourcePath,
+        resourceQuery,
         content
       );
     }
@@ -85,11 +86,42 @@ class EleventyLoad {
     return result;
   }
 
+  testCondition(condition, test) {
+    // If there's no condition, return true immediately
+    if (condition === null || condition === undefined) {
+      return true;
+    }
+
+    // If the condition is boolean, return that value
+    if (typeof condition === 'boolean') {
+      return !!condition;
+    } else if (condition instanceof Boolean) {
+      return condition.valueOf();
+    }
+
+    // If the condition is a regular expression, test it
+    if (condition instanceof RegExp) {
+      return condition.test(test);
+    }
+
+    // If the condition is an array, do an OR test on its values
+    if (Array.isArray(condition)) {
+      return condition.some(value => this.testCondition(value, test));
+    }
+
+    // Probably some way to make use of Objects here, for predetermined
+    // tests, e.g. { gt: 3, lt: 27 }, but for now, we're skippings them.
+
+    // Finally, apply a basic equality test
+    return (''+condition) === test;
+  }
+
   // Get loaders for resource
-  getLoaders(resourcePath) {
+  getLoaders(resourcePath, resourceQuery = '') {
     // Find which rule matches the given resource path
     const rule = this.options.rules.find((rule) =>
-      rule.test.test(resourcePath)
+      this.testCondition(rule.test, resourcePath) &&
+      this.testCondition(rule.resourceQuery, resourceQuery)
     );
 
     // Return loaders if they exist, else null
@@ -104,9 +136,9 @@ class EleventyLoad {
   }
 
   // Process file with the given loaders
-  async processFile(resource, resourcePath, content) {
+  async processFile(resource, resourcePath, resourceQuery, content) {
     // Get loaders for file
-    const loaders = this.getLoaders(resourcePath);
+    const loaders = this.getLoaders(resourcePath, resourceQuery);
 
     // Return content or path if no loaders match
     if (loaders === null) return content || resource;
