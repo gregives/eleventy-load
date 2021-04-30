@@ -93,7 +93,7 @@ class EleventyLoad {
     }
 
     // If the condition is boolean, return that value
-    if (typeof condition === 'boolean') {
+    if (typeof condition === "boolean") {
       return !!condition;
     } else if (condition instanceof Boolean) {
       return condition.valueOf();
@@ -106,22 +106,20 @@ class EleventyLoad {
 
     // If the condition is an array, do an OR test on its values
     if (Array.isArray(condition)) {
-      return condition.some(value => this.testCondition(value, test));
+      return condition.some((value) => this.testCondition(value, test));
     }
 
-    // Probably some way to make use of Objects here, for predetermined
-    // tests, e.g. { gt: 3, lt: 27 }, but for now, we're skippings them.
-
     // Finally, apply a basic equality test
-    return (''+condition) === test;
+    return "" + condition === test;
   }
 
   // Get loaders for resource
-  getLoaders(resourcePath, resourceQuery = '') {
+  getLoaders(resourcePath, resourceQuery) {
     // Find which rule matches the given resource path
-    const rule = this.options.rules.find((rule) =>
-      this.testCondition(rule.test, resourcePath) &&
-      this.testCondition(rule.resourceQuery, resourceQuery)
+    const rule = this.options.rules.find(
+      (rule) =>
+        this.testCondition(rule.test, resourcePath) &&
+        this.testCondition(rule.resourceQuery, resourceQuery)
     );
 
     // Return loaders if they exist, else null
