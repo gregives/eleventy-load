@@ -5,7 +5,7 @@ const utils = require("./utils");
 const DEBUG_STRING = "[eleventy-load]";
 
 class EleventyLoad {
-  constructor(options, cache, resource, content, config) {
+  constructor(options, cache, resource, content, config, cachePath) {
     this.options = options;
     this.cache = cache;
 
@@ -21,7 +21,7 @@ class EleventyLoad {
     };
 
     // Start processing initial dependency
-    return this.addDependency(resource, content);
+    return this.addDependency(resource, content, cachePath);
   }
 
   debug(string, override) {
@@ -31,7 +31,7 @@ class EleventyLoad {
   }
 
   // Process additional dependencies straight away
-  async addDependency(resource, content = null) {
+  async addDependency(resource, content = null, cachePath = resource) {
     const [resourcePath, resourceQuery] = resource.split(/(?=\?)/g);
 
     // Dependent resource
@@ -65,9 +65,9 @@ class EleventyLoad {
     };
 
     // Start processing file and add to cache
-    if (!this.cache.hasOwnProperty(resolvedResource)) {
+    if (!this.cache.hasOwnProperty(cachePath)) {
       this.debug(`Processing resource: ${resource}`);
-      this.cache[resolvedResource] = this.processFile(
+      this.cache[cachePath] = this.processFile(
         resource,
         resolvedResourcePath,
         resourceQuery,
@@ -76,7 +76,7 @@ class EleventyLoad {
     }
 
     // Wait for resource to be processed
-    const result = await this.cache[resolvedResource];
+    const result = await this.cache[cachePath];
 
     // Reset to dependent resource
     this.context = {
@@ -194,14 +194,15 @@ module.exports = function (config, options) {
   const cache = {};
 
   // Create new EleventyLoad instance in transform
-  config.addTransform("eleventy-load", function (content) {
+  config.addTransform("eleventy-load", function (content, outputPath) {
     const resource = path.relative(this._config.inputDir, this.inputPath);
     return new EleventyLoad(
       options,
       cache,
       resource,
       content,
-      createConfig("transform", config, this)
+      createConfig("transform", config, this),
+      outputPath
     );
   });
 
@@ -212,7 +213,8 @@ module.exports = function (config, options) {
       cache,
       resource,
       null,
-      createConfig("shortcode", config, this)
+      createConfig("shortcode", config, this),
+      resource
     );
   });
 
