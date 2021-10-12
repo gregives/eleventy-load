@@ -31,7 +31,7 @@ class EleventyLoad {
   }
 
   // Process additional dependencies straight away
-  async addDependency(resource, content = null, cachePath = resource) {
+  async addDependency(resource, content = null, cachePath) {
     const [resourcePath, resourceQuery] = resource.split(/(?=\?)/g);
 
     // Dependent resource
@@ -63,6 +63,8 @@ class EleventyLoad {
       ...this.context,
       ...currentResource,
     };
+
+    cachePath = cachePath || resolvedResource;
 
     // Start processing file and add to cache
     if (!this.cache.hasOwnProperty(cachePath)) {
@@ -214,7 +216,7 @@ module.exports = function (config, options) {
       resource,
       null,
       createConfig("shortcode", config, this),
-      resource
+      null
     );
   });
 
