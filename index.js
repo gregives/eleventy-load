@@ -162,13 +162,22 @@ class EleventyLoad {
   }
 }
 
-// Create config frpm transform or shortcode context
+function getDir(filePath, fallback) {
+  if (filePath) {
+    return path.normalize(path.dirname(filePath));
+  }
+  return path.normalize(fallback);
+}
+
+// Create config from transform or shortcode context
 function createConfig(type, config, context) {
   return {
     transform() {
+      // Use v1 context paths, else fallback to internal config
+      const { inputPath, outputPath, _config: { dir = {} } = {} } = context;
       return {
-        inputDir: path.normalize(context._config.dir.input),
-        outputDir: path.normalize(context._config.dir.output),
+        inputDir: getDir(inputPath, dir.input),
+        outputDir: getDir(outputPath, dir.output),
         ...config,
       };
     },
@@ -196,17 +205,25 @@ module.exports = function (config, options) {
   const cache = {};
 
   // Create new EleventyLoad instance in transform
-  config.addTransform("eleventy-load", function (content, outputPath) {
-    const resource = path.relative(this._config.inputDir, this.inputPath);
-    return new EleventyLoad(
-      options,
-      cache,
-      resource,
-      content,
-      createConfig("transform", config, this),
-      outputPath
-    );
-  });
+  config.addTransform(
+    "eleventy-load",
+    function (content, deprecatedOutputPath) {
+      // 11ty@1.x.x does not expose _config but inputPath should be relative to
+      // the project route so we can use the node cwd.
+      const inputDir = process.cwd();
+      // outputPath argument is deprecated in 11ty@1.x.x
+      const outputPath = deprecatedOutputPath || this.outputPath;
+      const resource = path.relative(inputDir, this.inputPath);
+      return new EleventyLoad(
+        options,
+        cache,
+        resource,
+        content,
+        createConfig("transform", config, this),
+        outputPath
+      );
+    }
+  );
 
   // Create new EleventyLoad instance in shortcode
   config.addShortcode("load", function (resource) {
