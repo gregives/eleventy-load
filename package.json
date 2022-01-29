@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "release": "np",
-    "test": "jest",
-    "test:watch": "jest --watch"
+    "lint": "eslint --ext .js --cache",
+    "test": "npm run lint -- --quiet && jest",
+    "test:watch": "jest --watch --coverage=false"
   },
   "repository": "gregives/eleventy-load",
   "homepage": "https://eleventy-load.xyz",
