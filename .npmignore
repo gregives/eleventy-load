@@ -7,3 +7,4 @@
 .eslintrc
 jest.config.js
 *.test.js
+testUtils
