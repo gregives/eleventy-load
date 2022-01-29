@@ -4,7 +4,9 @@
   "description": "Use loaders to post-process files in your Eleventy project",
   "main": "index.js",
   "scripts": {
-    "release": "np"
+    "release": "np",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "repository": "gregives/eleventy-load",
   "homepage": "https://eleventy-load.xyz",
@@ -23,6 +25,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "husky": "^7.0.2",
+    "jest": "^27.4.7",
     "lint-staged": "^11.2.3",
     "np": "^7.5.0",
     "prettier": "^2.4.1"
