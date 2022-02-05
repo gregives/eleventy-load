@@ -1,13 +1,19 @@
 const plugin = require("./index");
 const EleventyLoad = require("./EleventyLoad");
 const createConfig = require("./utils/createConfig");
-const eleventyMocks = require("./testUtils/eleventyMocks");
+const {
+  mockValues,
+  mockTransform,
+  mockShortcode,
+} = require("./testUtils/eleventyMock");
 
 jest.mock("./EleventyLoad");
 jest.mock("./utils/createConfig");
 
 describe("eleventy-load plugin", () => {
   const { inputDir, outputDir, outputPath } = eleventyMocks.getValues();
+
+  const { inputDir, outputDir, outputPath } = mockValues;
 
   const rules = [{ test: /\.html$/, loaders: [] }];
 
@@ -18,9 +24,6 @@ describe("eleventy-load plugin", () => {
   };
 
   class StubEleventyLoad {}
-
-  // Eleventy interface pre v1.0.0
-  const mockEleventyContext = eleventyMocks.v0_x_x();
 
   const mockCreatedConfig = {
     transform: () => ({ inputDir, outputDir }),
@@ -50,7 +53,8 @@ describe("eleventy-load plugin", () => {
 
   test("Returns an EleventyLoad instance on transform", () => {
     const content = ["content"];
-    const resource = "template.ejs"; //  relative to inputDir
+    const resource = "index.md"; //  FIXME: relative to inputDir?
+    const mockEleventyContext = mockTransform.v0_x_x();
 
     plugin(mockConfig, { rules });
 
@@ -82,6 +86,8 @@ describe("eleventy-load plugin", () => {
 
   test("Returns an EleventyLoad instance on shortcode `load`", () => {
     const resource = "resource";
+    const mockEleventyContext = mockShortcode.v0_x_x();
+
     plugin(mockConfig, { rules });
 
     const callback = mockConfig.addShortcode.mock.calls[0][1];

@@ -1,28 +1,33 @@
 const createConfig = require("./createConfig");
-const eleventyMocks = require("../testUtils/eleventyMocks");
+const {
+  mockValues,
+  mockTransform,
+  mockShortcode,
+} = require("../testUtils/eleventyMock");
 
 describe("createConfig", () => {
   const mockConfig = { _mockedConfigProp: true };
 
-  // Eleventy interface pre v1.0.0
-  const mockEleventyContext = eleventyMocks.v0_x_x();
-
   test("Returns expected config for `transform`", () => {
+    const mockEleventyContext = mockTransform.v0_x_x();
+
     const result = createConfig("transform", mockConfig, mockEleventyContext);
 
     expect(result).toEqual({
-      inputDir: "test/some/",
-      outputDir: "dist",
+      inputDir: mockValues.inputDir,
+      outputDir: mockValues.outputDir,
       _mockedConfigProp: true,
     });
   });
 
   test("Returns expected config for `shortcode`", () => {
+    const mockEleventyContext = mockShortcode.v0_x_x();
+
     const result = createConfig("shortcode", mockConfig, mockEleventyContext);
 
     expect(result).toEqual({
-      inputDir: "test",
-      outputDir: ".",
+      inputDir: mockValues.inputDir,
+      outputDir: mockValues.outputDir,
       _mockedConfigProp: true,
     });
   });
