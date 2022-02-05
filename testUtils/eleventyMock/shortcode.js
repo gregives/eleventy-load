@@ -10,4 +10,15 @@ const version_0_x_x = () => ({
   },
 });
 
+const version_1_x_x = () => ({
+  ctx: {}, // not used by plugin
+  page: {
+    inputPath,
+    outputPath,
+    filePathStem,
+    url,
+  },
+});
+
 exports.v0_x_x = version_0_x_x;
+exports.v1_x_x = version_1_x_x;
