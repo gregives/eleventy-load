@@ -45,6 +45,8 @@ module.exports = function (config, options) {
   });
 
   // Clear cache on re-runs
+  // TODO: update deprecated event name v0.11.0
+  // https://www.11ty.dev/docs/events/#eleventy.beforewatch
   config.on("beforeWatch", () => {
     for (const resource in cache) {
       delete cache[resource];

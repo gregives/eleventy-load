@@ -89,6 +89,16 @@ Loaders can process any file, from a text file to images. See a list of loaders 
 
 I'd love some help adding tests to eleventy-load and growing the ecosystem of loaders. If you'd like to contribute, get in touch with me!
 
+### Development
+
+- Clone this repo and run `npm install`
+- Configure your IDE to run prettier/eslint on save.
+- Run `npm run test:watch` which will run tests on changed files while you work.
+- Please add tests for any new features. Run `npm test` to lint, run tests and get a coverage report.
+
+It's a pain to manually test changes against a running 11ty instance, especially for different versions. The tests make this simpler by mocking the interface to 11ty for each major version. This gives reasonable confidence that the plugin is compatible with each major 11ty release.
+
+
 <!-- References -->
 
 [eleventy-load-index]: https://eleventy-load.xyz/
