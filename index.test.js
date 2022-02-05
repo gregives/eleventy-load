@@ -11,8 +11,6 @@ jest.mock("./EleventyLoad");
 jest.mock("./utils/createConfig");
 
 describe("eleventy-load plugin", () => {
-  const { inputDir, outputDir, outputPath } = eleventyMocks.getValues();
-
   const { inputDir, outputDir, outputPath } = mockValues;
 
   const rules = [{ test: /\.html$/, loaders: [] }];
@@ -53,7 +51,7 @@ describe("eleventy-load plugin", () => {
 
   test("Returns an EleventyLoad instance on transform", () => {
     const content = ["content"];
-    const resource = "index.md"; //  FIXME: relative to inputDir?
+    const resource = "src/index.md";
     const mockEleventyContext = mockTransform.v0_x_x();
 
     plugin(mockConfig, { rules });
