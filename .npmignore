@@ -2,9 +2,12 @@
 .eslintcache
 /coverage
 
-# exlude development files
+# exclude development files
 .editorconfig
 .eslintrc
 jest.config.js
 *.test.js
 testUtils
+
+# exclude CI configs
+.github
