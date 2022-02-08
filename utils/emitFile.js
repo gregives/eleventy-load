@@ -5,7 +5,7 @@ const crypto = require("crypto");
 const hashContent = (content, length) =>
   crypto.createHash("md5").update(content).digest("hex").slice(0, length);
 
-module.exports = function (content, filepath, emitFile = true) {
+module.exports = function (content, filepath, shouldEmitFile = true) {
   const { dir, ext, name } = path.parse(this.context.resourcePath);
 
   // Placeholder values to replace
@@ -33,7 +33,7 @@ module.exports = function (content, filepath, emitFile = true) {
     filepath = filepath.replace(test, replace);
   });
 
-  if (emitFile) {
+  if (shouldEmitFile) {
     // Ensure directory exists
     const { dir } = path.parse(filepath);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });

@@ -1,0 +1,10 @@
+# As per gitignore
+.eslintcache
+/coverage
+
+# exlude development files
+.editorconfig
+.eslintrc
+jest.config.js
+*.test.js
+testUtils
