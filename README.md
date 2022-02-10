@@ -1,5 +1,6 @@
 # eleventy-load ⚡
 
+![Tests](https://github.com/gregives/eleventy-load/actions/workflows/test.yml/badge.svg)
 [![npm version][npm-version-src]][npm-version-href]
 [![npm downloads][npm-downloads-src]][npm-downloads-href]
 [![License][license-src]][license-href]
@@ -95,6 +96,7 @@ I'd love some help adding tests to eleventy-load and growing the ecosystem of lo
 - Configure your IDE to run prettier/eslint on save.
 - Run `npm run test:watch` which will run tests on changed files while you work.
 - Please add tests for any new features. Run `npm test` to lint, run tests and get a coverage report.
+- Tests will run when you push to remote
 
 It's a pain to manually test changes against a running 11ty instance, especially for different versions. The tests make this simpler by mocking the interface to 11ty for each major version. This gives reasonable confidence that the plugin is compatible with each major 11ty release.
 
