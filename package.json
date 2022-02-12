@@ -1,6 +1,6 @@
 {
   "name": "eleventy-load",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Use loaders to post-process files in your Eleventy project",
   "main": "index.js",
   "scripts": {
