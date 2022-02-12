@@ -1,3 +1,4 @@
+const path = require("path");
 const plugin = require("./index");
 const EleventyLoad = require("./EleventyLoad");
 const createConfig = require("./utils/createConfig");
@@ -56,7 +57,7 @@ describe.each(["v0_x_x", "v1_x_x"])(
 
     test("Returns an EleventyLoad instance on transform", () => {
       const content = ["content"];
-      const resource = "src/index.md";
+      const resource = path.join("src", "index.md");
       const mockEleventyContext = mockTransform[eleventyVersion]();
 
       plugin(mockConfig, { rules });
