@@ -3,6 +3,9 @@
   "version": "0.3.0",
   "description": "Use loaders to post-process files in your Eleventy project",
   "main": "index.js",
+  "11ty": {
+    "compatibility": ">=0.5.0 <2.x"
+  },
   "scripts": {
     "release": "np",
     "lint": "eslint --ext .js --cache",

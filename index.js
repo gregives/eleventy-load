@@ -1,8 +1,17 @@
 const path = require("path");
+const pkg = require("./package.json");
 const { createConfig, DEBUG_STRING } = require("./utils");
 const EleventyLoad = require("./EleventyLoad");
 
 module.exports = function (config, options) {
+  try {
+    config.versionCheck(pkg["11ty"].compatibility);
+  } catch (e) {
+    console.warn(
+      `WARN: Eleventy Plugin (${pkg.name}) Compatibility: ${e.message}`
+    );
+  }
+
   // Return and warn if no rules are given
   if (!(options.rules instanceof Array)) {
     console.warn(`${DEBUG_STRING} Try giving me some rules!`);
