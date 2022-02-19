@@ -1,6 +1,6 @@
 const path = require("path");
 const pkg = require("./package.json");
-const { createConfig, DEBUG_STRING } = require("./utils");
+const { createConfig } = require("./utils");
 const EleventyLoad = require("./EleventyLoad");
 
 module.exports = function (config, options) {
@@ -14,7 +14,7 @@ module.exports = function (config, options) {
 
   // Return and warn if no rules are given
   if (!(options.rules instanceof Array)) {
-    console.warn(`${DEBUG_STRING} Try giving me some rules!`);
+    console.warn(`[${pkg.name}] Try giving me some rules!`);
     return;
   }
 
