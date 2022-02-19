@@ -5,12 +5,16 @@ on: [push]
 jobs:
   test:
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
-        node-version: [12.x, 14.x, 16.x]
+        node: [10, 12, 14, 16]
+        os: [ubuntu-latest]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        include:
+          - node: 14
+            os: windows-latest
 
     steps:
     - uses: actions/checkout@v2
