@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
-const { emitFile, DEBUG_STRING } = require("./utils");
+const pkg = require("./package.json");
+const { emitFile } = require("./utils");
 
 module.exports = class EleventyLoad {
   constructor(options, cache, resource, content, config, cachePath) {
@@ -22,7 +23,7 @@ module.exports = class EleventyLoad {
 
   debug(string, override) {
     if (this.options.debug || override) {
-      console.info(`${DEBUG_STRING} ${string}`);
+      console.info(`[${pkg.name}] ${string}`);
     }
   }
 

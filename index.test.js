@@ -1,5 +1,4 @@
 const path = require("path");
-const plugin = require("./index");
 const EleventyLoad = require("./EleventyLoad");
 const createConfig = require("./utils/createConfig");
 const {
@@ -11,18 +10,60 @@ const {
 jest.mock("./EleventyLoad");
 jest.mock("./utils/createConfig");
 
+const mockConfig = {
+  addTransform: jest.fn(),
+  addShortcode: jest.fn(),
+  versionCheck: jest.fn(),
+  on: jest.fn(),
+};
+
+const rules = [{ test: /\.html$/, loaders: [] }];
+
+// Lazy-load plugin in tests so we can mock its dependences
+let plugin = undefined;
+
+afterEach(() => {
+  jest.clearAllMocks();
+});
+
+describe("eleventy-load config", () => {
+  const mockWarn = jest.spyOn(console, "warn").mockImplementation();
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  afterAll(() => {
+    mockWarn.mockRestore();
+  });
+
+  test("Warns if rules not provided", () => {
+    plugin = require("./index");
+
+    plugin(mockConfig, { rules: undefined });
+    expect(mockWarn).toBeCalledWith(
+      "[eleventy-load] Try giving me some rules!"
+    );
+  });
+
+  test("Checks the 11ty version for compatibility", () => {
+    mockConfig.versionCheck.mockImplementationOnce(() => {
+      throw Error("not compatible");
+    });
+    plugin = require("./index");
+
+    plugin(mockConfig, { rules });
+    expect(mockConfig.versionCheck).toBeCalledWith(">=0.5.0 <2.x");
+    expect(mockWarn).toBeCalledWith(
+      "WARN: Eleventy Plugin (eleventy-load) Compatibility: not compatible"
+    );
+  });
+});
+
 describe.each(["v0_x_x", "v1_x_x"])(
   "eleventy-load plugin (11ty %s)",
   (eleventyVersion) => {
     const { inputDir, outputDir, outputPath } = mockValues;
-
-    const rules = [{ test: /\.html$/, loaders: [] }];
-
-    const mockConfig = {
-      addTransform: jest.fn(),
-      addShortcode: jest.fn(),
-      on: jest.fn(),
-    };
 
     class StubEleventyLoad {}
 
@@ -34,10 +75,7 @@ describe.each(["v0_x_x", "v1_x_x"])(
     beforeEach(() => {
       EleventyLoad.mockReturnValue(StubEleventyLoad);
       createConfig.mockReturnValue(mockCreatedConfig);
-    });
-
-    afterEach(() => {
-      jest.clearAllMocks();
+      plugin = require("./index");
     });
 
     test("Adds the `eleventy-load` transform", () => {
